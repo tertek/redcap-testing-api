@@ -13,6 +13,10 @@ Extends the REDCap API to expose system and server info for enabling automated E
 
 *Info for HTTP Client Testing* 
 <br>The full path to the API endpoint is `<APP_PATH_FULL>/?NOAUTH&type=module&prefix=testing_api&page=endpoint`
+<br>The token has to be added as basic token to the request header (not to the body as it is with the REDCap API)
+
+![image](https://user-images.githubusercontent.com/75415872/109808495-7b5a0d00-7c27-11eb-9c51-0cc30dad594f.png)
+
 
 ## Example `json response`
 
