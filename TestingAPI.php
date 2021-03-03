@@ -63,8 +63,11 @@ class TestingAPI extends AbstractExternalModule {
 
             "projects" =>$this->getProjectInfo(),
             "external_modules" => $this->getModuleInfo(),
+            
 
             // dev only
+            "ids" => $this->getModuleIDs(),
+
             //"request_vars" => $this->request->getRequestVars(),
             "server" => $_SERVER
             
@@ -88,9 +91,16 @@ class TestingAPI extends AbstractExternalModule {
         return $result;
     }
 
+    private function getModuleIDs() {
+        $sql = "SELECT external_module_id FROM `redcap_external_modules` WHERE NOT directory_prefix = 'testing_api'";
+        $query = $this->query( $sql, array() );
+        $result = mysqli_fetch_all( $query , MYSQLI_NUM);
+        return array_merge(...$result);
+    }
+
     # Get info for all installed external modules
     private function getModuleInfo() {
-        $sql = "SELECT * FROM `redcap_external_modules`";
+        $sql = "SELECT * FROM `redcap_external_modules` WHERE NOT directory_prefix = 'testing_api'";
         $query = $this->query( $sql, array() );
         $result = mysqli_fetch_all( $query , MYSQLI_ASSOC);
 
