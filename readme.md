@@ -8,6 +8,9 @@ Extends the REDCap API to expose system and server info for enabling automated E
 - Navigate to the REDCap Testing API module page which has been created in the Control Center under "External Modules" by clicking on "Testing API"
 - Copy & Paste environment variables into your **Cypress REDCap** environment or use them with an HTTP Client such as Postman for API testing
 
+![image](https://user-images.githubusercontent.com/75415872/109808215-20c0b100-7c27-11eb-82e1-071abc8ca9d5.png)
+
+
 *Info for HTTP Client Testing* 
 <br>The full path to the API endpoint is `<APP_PATH_FULL>/?NOAUTH&type=module&prefix=testing_api&page=endpoint`
 
