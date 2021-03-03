@@ -11,7 +11,7 @@ Extends the REDCap API to expose system and server info for enabling automated E
 ![image](https://user-images.githubusercontent.com/75415872/109808215-20c0b100-7c27-11eb-82e1-071abc8ca9d5.png)
 
 ## Alternative access via HTTP Client (e.g. Postman)
-- the full path to the API endpoint is `<APP_PATH_WEBROOT_FULL>/api/?NOAUTH&type=module&prefix=testing_api&page=endpoint`
+- the full path to the API endpoint is `<REDCAP_BASEURL>/api/?NOAUTH&type=module&prefix=testing_api&page=endpoint`
 - the token has to be added as API token to the request header (not to the body as it is with the REDCap API)
 
 ![image](https://user-images.githubusercontent.com/75415872/109808495-7b5a0d00-7c27-11eb-9c51-0cc30dad594f.png)
