@@ -1,12 +1,12 @@
 # REDCap Testing API
-Extends the REDCap API to expose system and server info for enabling automated E2E-Testing with Cypress. This module is made to be used with Cypress REDCap. Learn more about Cypress REDCap [here](#tbd).
+Extends the REDCap API to expose system and server info for enabling automated E2E-Testing with Cypress. This module is made to be used with **Cypress REDCap**. [Learn more about Cypress REDCap](#tbd).
 
 ## Setup
 
 - Install REDCap Testing API external module via [Official REDCap Module Repository](https://redcap.vanderbilt.edu/consortium/modules/)
 - Enable REDCap Testing API external module in Control Center
 - Navigate to the REDCap Testing API module page which has been created in the Control Center under "External Modules" by clicking on "Testing API"
-- Copy & Paste environment variables into your Cypress REDCap environment or use them with an HTTP Client such as Postman for API testing
+- Copy & Paste environment variables into your **Cypress REDCap** environment or use them with an HTTP Client such as Postman for API testing
 
 *Info for HTTP Client Testing* 
 <br>The full path to the API endpoint is `<APP_PATH_FULL>/?NOAUTH&type=module&prefix=testing_api&page=endpoint`
