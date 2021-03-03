@@ -1,24 +1,23 @@
 # REDCap Testing API
 Extends the REDCap API to expose system and server info for enabling automated E2E-Testing with Cypress. This module is made to be used with **Cypress REDCap**. [Learn more about Cypress REDCap](#tbd).
 
-## Setup
+## Setup for usage with Cypress
 
 - Install REDCap Testing API external module via [Official REDCap Module Repository](https://redcap.vanderbilt.edu/consortium/modules/)
 - Enable REDCap Testing API external module in Control Center
 - Navigate to the REDCap Testing API module page which has been created in the Control Center under "External Modules" by clicking on "Testing API"
-- Copy & Paste environment variables into your **Cypress REDCap** environment or use them with an HTTP Client such as Postman for API testing
+- Copy & Paste environment variables into your **Cypress REDCap** environment
 
 ![image](https://user-images.githubusercontent.com/75415872/109808215-20c0b100-7c27-11eb-82e1-071abc8ca9d5.png)
 
-
-*Info for HTTP Client Testing* 
-<br>The full path to the API endpoint is `<APP_PATH_FULL>/?NOAUTH&type=module&prefix=testing_api&page=endpoint`
-<br>The token has to be added as basic token to the request header (not to the body as it is with the REDCap API)
+## Alternative access via HTTP Client (e.g. Postman)
+- the full path to the API endpoint is `<APP_PATH_WEBROOT_FULL>/api/?NOAUTH&type=module&prefix=testing_api&page=endpoint`
+- the token has to be added as API token to the request header (not to the body as it is with the REDCap API)
 
 ![image](https://user-images.githubusercontent.com/75415872/109808495-7b5a0d00-7c27-11eb-9c51-0cc30dad594f.png)
 
 
-## Example `json response`
+## Example `json` response
 
 ```json
 {
