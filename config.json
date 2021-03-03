@@ -1,0 +1,39 @@
+{
+    "name": "Testing API",
+    "namespace": "STPH\\TestingAPI",
+    "framework-version": 6,
+    "description": "Module to fascilitate cypress-redcap testing.",
+    "authors": [
+        {
+            "name": "Ekin Tertemiz",
+            "email": "ekin.tertemiz@swisstph.ch",
+            "institution": "Swiss Tropical and Public Health Institute"
+        }
+    ],
+    "permissions": [
+        "redcap_control_center",
+        "redcap_module_system_enable"
+    ],
+    "system-settings": [
+        {   
+            "key": "testing-api-token",
+            "name": "Testing API Token",
+            "type": "text",
+            "hidden": true
+        }
+    ],
+    "no-auth-pages": [
+        "endpoint"
+    ],
+    "links": {
+        "control-center": [
+           {
+              "name": "Testing API",
+              "key": "testing-api",
+              "icon": "fas fa-vial",
+              "url": "index.php",
+              "show-header-and-footer": true
+           }
+        ]
+     }
+}

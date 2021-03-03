@@ -1,0 +1,148 @@
+<?php
+// Set the namespace defined in your config file
+namespace STPH\TestingAPI;
+
+use ExternalModules\AbstractExternalModule;
+use ExternalModules\ExternalModules;
+use System;
+use RestUtility;
+use RCView;
+
+
+/**
+ * Class TestingAPI
+ * @package STPH\TestingAPI
+ */
+class TestingAPI extends AbstractExternalModule {
+
+    private $config;
+    private $token;
+    private $request;
+    private $response;
+
+    public function __construct() {
+        parent::__construct();
+        $this->config =  System::getConfigVals();
+        $this->token = $this->getSystemSetting('testing-api-token');
+    }
+
+    # Process Testing API request as REDCap API request 
+    # without REDCap API token (false) since we're using our own token
+    protected function processTestingAPIRequest() {
+        $this->request = RestUtility::processRequest(false);        
+        $this->authTestingAPIToken();
+        $this->handleTestingAPIResponse();
+    }
+
+    # Authenticate with Testing API Token
+    # Deny access if token mismatch or no token supplied
+    protected function authTestingAPIToken() {
+        if(!isset($_SERVER['HTTP_TOKEN']) || $_SERVER['HTTP_TOKEN']  !==  $this->token ) {
+            RestUtility::sendResponse(403);
+        }
+    }
+
+    # Generate response array
+    # Return a selection of REDCap config information, modules & project info and general server info.
+    private function generateTestingAPIResponse() {
+
+        // Dev only
+        $this->response =  array(
+
+            "configuration" => array(
+                "redcap_version" => $this->config["redcap_version"],
+                "api_enabled" => $this->config["api_enabled"],
+                "is_development_server"=> $this->config["is_development_server"],
+    
+                "language_global" => $this->config["language_global"],
+                "project_language" => $this->config["project_language"],
+                
+                "homepage_contact_email" => $this->config["homepage_contact_email"],
+                "project_contact_email" => $this->config["project_contact_email"],
+            ),
+
+            "projects" =>$this->getProjectInfo(),
+            "external_modules" => $this->getModuleInfo(),
+
+            // dev only
+            //"request_vars" => $this->request->getRequestVars(),
+            "server" => $_SERVER
+            
+        );
+    }
+
+    # Generate and send back response to client
+    private function handleTestingAPIResponse() {
+        $this->generateTestingAPIResponse();
+        RestUtility::sendResponse(200, json_encode($this->response), 'json');
+    }
+
+
+    #  Get all project ids for projects that are not demo projects
+    private function getProjectInfo() {
+        $sql = "SELECT p.project_id, p.project_name, p.status,p.project_language, p.surveys_enabled FROM `redcap_projects` p WHERE p.purpose IS NOT NULL";
+        $query = $this->query( $sql, array() );
+        $result = mysqli_fetch_all( $query , MYSQLI_ASSOC);
+        
+        //return array_merge(...$result);
+        return $result;
+    }
+
+    # Get info for all installed external modules
+    private function getModuleInfo() {
+        $sql = "SELECT * FROM `redcap_external_modules`";
+        $query = $this->query( $sql, array() );
+        $result = mysqli_fetch_all( $query , MYSQLI_ASSOC);
+
+        return $result;
+    }
+
+    public function getResponse() {
+        $this->processTestingAPIRequest();
+    }
+
+    public function renderModulePage() {
+
+        ## Page title
+        print RCView::h4(array('style'=>'margin-top:0;'), '<i class="fas fa-vial"></i> Testing API' . "<span class=\"text-secondary ml-2\">(Cypress REDCap)</span>");
+        print  "<p>
+			This page will help you to configure your local <a href='#link-to-cypress-redcap'>cypress-redcap</a> application for sucessfully authenticating with REDCap and retrieve testing data.
+		</p>";
+        
+        ## Subtitle
+        print "<p style='padding-top:10px;color:#800000;font-weight:bold;font-family:verdana;font-size:13px;'>Copy & Paste into your <code>.env</code> file</p>";
+
+        # Warning if token is not set
+        if(!isset($this->token) || empty($this->token)) {          
+            print RCView::warnBox("Testing Token is not set. Please re-enable this module to fix the issue.");
+        }
+ 
+        else {
+            print RCView::pre( array(), 
+                    RCView::code(array('style' => 'color:#e83e8c;'), 
+                        'REDCAP_BASEURL = '.APP_PATH_WEBROOT_FULL . '<br>' .
+                        'REDCAP_TESTING_API_TOKEN = '.$this->token . '<br>'                        
+                    )                    
+                  );
+         }
+    }
+
+    #  Generate Testing API Token
+    private function generateToken(){
+        //  taken from /Classes/RedCapDB::setAPIToken
+        return strtoupper(md5( USERID . APP_PATH_WEBROOT_FULL  . generateRandomHash(mt_rand(64, 128))));
+    }
+
+
+    # Set the Testing API Token when module is beeing enabled on system level
+    public function redcap_module_system_enable() {        
+        $token = $this->getSystemSetting('testing-api-token');
+
+        # Generate and set a new token if empty or null
+        if( empty($token) || null === $token ) {
+            $token = $this->token =  $this->generateToken();
+            $this->setSystemSetting('testing-api-token', $token);
+        } 
+    }
+
+}
