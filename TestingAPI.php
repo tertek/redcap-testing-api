@@ -66,10 +66,10 @@ class TestingAPI extends AbstractExternalModule {
             
 
             // dev only
-            "ids" => $this->getModuleIDs(),
+            //"ids" => $this->getModuleIDs(),
 
             //"request_vars" => $this->request->getRequestVars(),
-            "server" => $_SERVER
+            //"server" => $_SERVER
             
         );
     }
@@ -131,7 +131,8 @@ class TestingAPI extends AbstractExternalModule {
             print RCView::pre( array(), 
                     RCView::code(array('style' => 'color:#e83e8c;'), 
                         'REDCAP_BASEURL = '.APP_PATH_WEBROOT_FULL . '<br>' .
-                        'REDCAP_TESTING_API_TOKEN = '.$this->token . '<br>'                        
+                        'REDCAP_TESTING_API_TOKEN = '.$this->token . '<br>' .
+                        'REDCAP_TESTING_ENDPOINT_URL = api/?NOAUTH&type=module&prefix=testing_api&page=endpoint'
                     )                    
                   );
          }
