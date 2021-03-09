@@ -7,6 +7,9 @@ use ExternalModules\ExternalModules;
 use System;
 use RestUtility;
 use RCView;
+use RedCapDB;
+use Authentication;
+use User;
 
 
 /**
@@ -14,72 +17,57 @@ use RCView;
  * @package STPH\TestingAPI
  */
 class TestingAPI extends AbstractExternalModule {
-
+    
     private $config;
     private $token;
+    private $isTestingUsersSet;
+
     private $request;
+    private $post;
+
     private $response;
+
 
     public function __construct() {
         parent::__construct();
         $this->config =  System::getConfigVals();
-        $this->token = $this->getSystemSetting('testing-api-token');
+        $this->token = $this->getSystemSetting('testing_api_token');
+        $this->isTestingUsersSet = $this->getSystemSetting("flag_testing_users_set");
+
     }
 
     # Process Testing API request as REDCap API request 
     # without REDCap API token (false) since we're using our own token
-    protected function processTestingAPIRequest() {
-        $this->request = RestUtility::processRequest(false);        
-        $this->authTestingAPIToken();
-        $this->handleTestingAPIResponse();
+    public function processTestingRequest() {
+
+        $this->request = RestUtility::processRequest(false);
+        $this->post = $this->request->getRequestVars();
+
+        $this->checkAuthentication();
+        $this->handleEndpoint();
+        //$this->handleResponse();
     }
 
-    # Authenticate with Testing API Token
+    # Check Authentication with Testing API Token
     # Deny access if token mismatch or no token supplied
-    protected function authTestingAPIToken() {
+    protected function checkAuthentication() {
         if(!isset($_SERVER['HTTP_TOKEN']) || $_SERVER['HTTP_TOKEN']  !==  $this->token ) {
             RestUtility::sendResponse(403);
         }
     }
 
-    # Generate response array
-    # Return a selection of REDCap config information, modules & project info and general server info.
-    private function generateTestingAPIResponse() {
+    protected function handleEndpoint() {
+        if(!isset($this->post['content']) || !isset($this->post['action'])) {
+            RestUtility::sendResponse(400, "No content and/or action set.");
+        }
 
-        // Dev only
-        $this->response =  array(
+        # Include endpoint to generate response
+        require ("endpoints/" . $this->post['content'] . "/" . $this->post['action']. ".php");
 
-            "configuration" => array(
-                "redcap_version" => $this->config["redcap_version"],
-                "api_enabled" => $this->config["api_enabled"],
-                "is_development_server"=> $this->config["is_development_server"],
-    
-                "language_global" => $this->config["language_global"],
-                "project_language" => $this->config["project_language"],
-                
-                "homepage_contact_email" => $this->config["homepage_contact_email"],
-                "project_contact_email" => $this->config["project_contact_email"],
-            ),
-
-            "projects" =>$this->getProjectInfo(),
-            "external_modules" => $this->getModuleInfo(),
-            
-
-            // dev only
-            //"ids" => $this->getModuleIDs(),
-
-            //"request_vars" => $this->request->getRequestVars(),
-            //"server" => $_SERVER
-            
-        );
-    }
-
-    # Generate and send back response to client
-    private function handleTestingAPIResponse() {
-        $this->generateTestingAPIResponse();
+        # Return response
         RestUtility::sendResponse(200, json_encode($this->response), 'json');
-    }
 
+    }
 
     #  Get all project ids for projects that are not demo projects
     private function getProjectInfo() {
@@ -105,10 +93,6 @@ class TestingAPI extends AbstractExternalModule {
         $result = mysqli_fetch_all( $query , MYSQLI_ASSOC);
 
         return $result;
-    }
-
-    public function getResponse() {
-        $this->processTestingAPIRequest();
     }
 
     public function renderModulePage() {
@@ -139,21 +123,22 @@ class TestingAPI extends AbstractExternalModule {
     }
 
     #  Generate Testing API Token
-    private function generateToken(){
+    private function generateTestingToken(){
         //  taken from /Classes/RedCapDB::setAPIToken
         return strtoupper(md5( USERID . APP_PATH_WEBROOT_FULL  . generateRandomHash(mt_rand(64, 128))));
     }
 
-
-    # Set the Testing API Token when module is beeing enabled on system level
-    public function redcap_module_system_enable() {        
-        $token = $this->getSystemSetting('testing-api-token');
-
-        # Generate and set a new token if empty or null
-        if( empty($token) || null === $token ) {
-            $token = $this->token =  $this->generateToken();
-            $this->setSystemSetting('testing-api-token', $token);
-        } 
+    # Set a new token if empty or null
+    private function handleTestingToken() {
+        if( empty( $this->token ) || null ===  $this->token ) {
+            $token = $this->token =  $this->generateTestingToken();
+            $this->setSystemSetting('testing_api_token', $token);
+        }
     }
 
+    # Hook into "enable module on system level"
+    public function redcap_module_system_enable() {               
+        #   Handle Testing API Token 
+        $this->handleTestingToken();
+    }
 }

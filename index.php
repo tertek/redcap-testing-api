@@ -1,3 +1,5 @@
 <?php
+#   Access via http://localhost/redcap-testing/api/?page=index&type=module&prefix=testing_api&NOAUTH
 
-print $module->renderModulePage();
+$module->processTestingRequest();
+

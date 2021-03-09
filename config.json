@@ -16,14 +16,38 @@
     ],
     "system-settings": [
         {   
-            "key": "testing-api-token",
+            "key": "testing_api_token",
             "name": "Testing API Token",
             "type": "text",
             "hidden": true
+        },
+        {
+            "key": "desc_testing_users",
+            "name": "<b>Define Testing Users</b><br><i>Generated automatically on module installation.</i>These users are accessible by the API through environment variables. Visit module page for authentication credentials. A random password and general access to all projects are set as default.",
+            "type": "descriptive"
+        },
+        {
+            "key": "testing_users",
+            "name": "Testing User",
+            "type": "sub_settings",
+            "repeatable": true,
+            "sub_settings": [
+                {
+                    "key": "testing_user_name",
+                    "name": "Testing User Name",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "key": "flag_testing_users_set",
+            "name": "Flag Testing Users set",
+            "hidden": "true",
+            "type": "text"
         }
     ],
     "no-auth-pages": [
-        "endpoint"
+        "index"
     ],
     "links": {
         "control-center": [
@@ -31,7 +55,7 @@
               "name": "Testing API",
               "key": "testing-api",
               "icon": "fas fa-vial",
-              "url": "index.php",
+              "url": "module_page.php",
               "show-header-and-footer": true
            }
         ]
