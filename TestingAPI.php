@@ -86,9 +86,10 @@ class TestingAPI extends AbstractExternalModule {
         return array_merge(...$result);
     }
 
-    # Get info for all installed external modules
+    #   Get info for all active external modules (except testing api module)
+    #   active means enabled set to true or version not null if no enabled exists
     private function getModuleInfo() {
-        $sql = "SELECT * FROM `redcap_external_modules` WHERE NOT directory_prefix = 'testing_api'";
+        $sql = "SELECT m.external_module_id, m.directory_prefix, s.key, s.value FROM `redcap_external_modules` m JOIN `redcap_external_module_settings` s ON m.external_module_id = s.external_module_id WHERE NOT m.directory_prefix = 'testing_api' AND( (s.key = 'enabled' AND s.value = 'true') OR ( (s.key = 'version' AND s.value IS NOT NULL and s.external_module_id NOT IN(SELECT external_module_id FROM redcap_external_module_settings s WHERE s.key = 'enabled' GROUP BY external_module_id))) ) ORDER BY s.external_module_id";
         $query = $this->query( $sql, array() );
         $result = mysqli_fetch_all( $query , MYSQLI_ASSOC);
 
@@ -116,7 +117,7 @@ class TestingAPI extends AbstractExternalModule {
                     RCView::code(array('style' => 'color:#e83e8c;'), 
                         'REDCAP_BASEURL = '.APP_PATH_WEBROOT_FULL . '<br>' .
                         'REDCAP_TESTING_API_TOKEN = '.$this->token . '<br>' .
-                        'REDCAP_TESTING_ENDPOINT_URL = api/?NOAUTH&type=module&prefix=testing_api&page=endpoint'
+                        'REDCAP_TESTING_ENDPOINT_URL = api/?NOAUTH&type=module&prefix=testing_api&page=index'
                     )                    
                   );
          }
